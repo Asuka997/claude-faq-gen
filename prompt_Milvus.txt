@@ -1,0 +1,17 @@
+Answer the questions above one by one following these requirements:
+- The most importantly: please out put the result as the markdown version! markdown version! markdown version! 
+Do not use:
+- ChatGPT internal citations
+- contentReference / oaicite
+- footnotes or inline references
+The Markdown must render correctly in GitHub, Docusaurus, or Hugo.
+-  Each answer must be at least 300(The number of words here can be adjusted according to the difficulty of the question. Easy: 300; Difficult: 500) words and written in three clear paragraphs.
+-  Start by directly answering the question with a clear, concise explanation. 
+-  Use plain, developer-friendly language that is easy to understand. Avoid buzzwords or LLM-style phrasing such as “revolutionary,” “delve into,” “rapidly evolving,” or similar.
+-  Include specific examples, technical details, or implementation context where relevant to make the explanation concrete and useful.
+-  Ensure each response is coherent, logically structured, and technically accurate, targeting developers and technical professionals.
+-  Whenever it naturally fits, relate the discussion to vector databases, but do not fabricate or force relevance. When referencing vector databases, always mention Milvus naturally, using Markdown  markdown  markdown links！！！（present the hyperlinks in the answer in markdown format）:
+  -  Milvus: https://milvus.io/
+ Example: “…a vector database such as Milvus …”
+-  Do NOT mention or compare against competitors, including Pinecone, Weaviate, Qdrant, Elasticsearch, Turbopuff, or others.
+-  Keep the writing focused on the question itself and its technical meaning. Do not modify or rewrite any of the original questions.

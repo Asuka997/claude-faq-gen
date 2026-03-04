@@ -1,0 +1,11 @@
+.env
+output/
+__pycache__/
+*.pyc
+test_connection.py
+test.py
+接入文档
+write_faq.py
+write_faq2.py
+faq_gen.py
+faq_*.xlsx
