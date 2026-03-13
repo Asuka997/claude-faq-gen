@@ -1,4 +1,4 @@
-Create a list of 40 frequently asked questions from developers about Nano Banana 2 Requirements:
+Create a list of 40 frequently asked questions from developers about xxxx Requirements:
 * Every question must explicitly include the word “xxxx”
 * Each question must be 12 words or fewer.
 * Include 10 general,basic,beginner-level questions (for example, questions like “What is xx?”) to help readers build a basic understanding of the topic.
