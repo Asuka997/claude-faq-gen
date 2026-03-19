@@ -204,7 +204,7 @@ if st.button("生成问题", type="primary", use_container_width=True):
         st.warning("请至少输入一个关键词。")
         st.stop()
 
-    all_questions: list[tuple[str, str, str]] = []  # (keyword, question, guidance)
+    all_questions: list[tuple[str, str, str, str]] = []  # (keyword, question, guidance, desc)
     errors = []
 
     prog = st.progress(0)
@@ -212,11 +212,22 @@ if st.button("生成问题", type="primary", use_container_width=True):
     for i, (kw, desc, guidance) in enumerate(keywords):
         status.text(f"[{i+1}/{len(keywords)}] 为关键词「{kw}」生成问题...")
         try:
-            prompt = build_question_prompt(kw, desc, int(count_per_kw))
+            target = int(count_per_kw)
+            prompt = build_question_prompt(kw, desc, target)
             raw = call_api(model, "", prompt)
-            qs = parse_questions(raw, max_count=int(count_per_kw))
+            qs = parse_questions(raw, max_count=target)
+            # Retry once if count is off
+            if len(qs) != target:
+                retry_prompt = build_question_prompt(kw, desc, target)
+                retry_prompt += f"\n\nPREVIOUS ATTEMPT PRODUCED {len(qs)} QUESTIONS. YOU MUST OUTPUT EXACTLY {target} QUESTIONS. No extra text, no headers, just {target} numbered questions."
+                raw2 = call_api(model, "", retry_prompt)
+                qs2 = parse_questions(raw2, max_count=target)
+                if len(qs2) > len(qs):
+                    qs = qs2
             for q in qs:
-                all_questions.append((kw, q, guidance))
+                all_questions.append((kw, q, guidance, desc))
+            if len(qs) != target:
+                errors.append(f"关键词「{kw}」：期望 {target} 个问题，实际生成 {len(qs)} 个")
         except Exception as e:
             errors.append(f"关键词「{kw}」生成失败：{str(e)[:100]}")
         prog.progress((i + 1) / len(keywords))
@@ -236,7 +247,7 @@ if st.button("生成问题", type="primary", use_container_width=True):
 if "questions" in st.session_state and st.session_state["questions"]:
     qs = st.session_state["questions"]
     with st.expander(f"查看问题列表（共 {len(qs)} 个）"):
-        preview_df = pd.DataFrame(qs, columns=["关键词", "问题", "回答指导"])
+        preview_df = pd.DataFrame(qs, columns=["关键词", "问题", "回答指导", "说明"])
         st.dataframe(preview_df, use_container_width=True, hide_index=True)
 
     # ═══════════════════════════════════════════════════════════════════
@@ -288,12 +299,14 @@ if "questions" in st.session_state and st.session_state["questions"]:
             base_prompt = open(answer_prompts[prompt_name], encoding="utf-8").read()
             rows = []
             assigned = prompt_questions[prompt_name]
-            for idx, (kw, question, guidance) in enumerate(assigned):
+            for idx, (kw, question, guidance, desc) in enumerate(assigned):
                 if st.session_state.get("stop_gen"):
                     stopped = True
                     break
                 status2.text(f"[{prompt_name}] [{idx + 1}/{len(assigned)}] {question[:55]}...")
                 effective_prompt = base_prompt
+                if desc:
+                    effective_prompt += f"\n\nKEYWORD CONTEXT: In this context, '{kw}' refers specifically to {desc}. Do not interpret '{kw}' in any other sense."
                 if guidance:
                     effective_prompt += f"\n\nADDITIONAL INSTRUCTIONS FOR THIS KEYWORD:\n{guidance}"
                 try:
